@@ -88,7 +88,7 @@ class RNNUpdater(training.StandardUpdater):
         optimizer.update()
 
 # 読込
-s = codecs.open("text/all-sentence.txt", "r", "utf-8")
+s = codecs.open("all-sentence.txt", "r", "utf-8")
 
 # 全ての分
 sentence = []

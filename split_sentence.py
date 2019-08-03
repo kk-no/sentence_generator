@@ -31,7 +31,7 @@ r.close()
 
 # 文章を単語インデックスのリストに変換する
 f.seek(0)
-r = codecs.open("text/all-sentense.txt", "w", "utf-8")
+r = codecs.open("text/all-sentence.txt", "w", "utf-8")
 
 # 文章になる単語のリスト
 sentence = []

@@ -9,7 +9,7 @@ word_count = 0
 word_list = {}
 
 # 読込
-f = codecs.open("alice-wakati.txt", "r", "utf-8")
+f = codecs.open("text/alice-wakati.txt", "r", "utf-8")
 
 # 1行ずつ処理
 line = f.readline()
@@ -24,14 +24,14 @@ while line:
     line = f.readline()
 
 # 単語と単語リストを保存する
-r = codecs.open("all-words.txt", "w", "utf-8")
+r = codecs.open("text/all-words.txt", "w", "utf-8")
 for w in word_list:
     r.write(str(word_list[w]) + "," + w + "\n")
 r.close()
 
 # 文章を単語インデックスのリストに変換する
 f.seek(0)
-r = codecs.open("all-sentense.txt", "w", "utf-8")
+r = codecs.open("text/all-sentense.txt", "w", "utf-8")
 
 # 文章になる単語のリスト
 sentence = []

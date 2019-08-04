@@ -93,64 +93,69 @@ class RNNUpdater(training.StandardUpdater):
         # 新しい重みデータで更新
         optimizer.update()
 
-# 読込
-s = codecs.open("all-sentence.txt", "r", "utf-8")
+    def main():
 
-# 全ての分
-sentence = []
+        # 読込
+        s = codecs.open("all-sentence.txt", "r", "utf-8")
 
-# 1行ずつ処理する
-line = s.readline()
-while line:
-    # 1つの文(開始文字のみ)
-    one = [0]
-    # 行の中の単語を数字のリストにして追加
-    one.extend(list(map(int, line.split(","))))
-    # 終端文字を入れる
-    one.append(1)
-    # 新しい分を追加
-    sentence.append(one)
-    line = s.readline()
+        # 全ての分
+        sentence = []
 
-# クローズ処理
-s.close()
+        # 1行ずつ処理する
+        line = s.readline()
+        while line:
+            # 1つの文(開始文字のみ)
+            one = [0]
+            # 行の中の単語を数字のリストにして追加
+            one.extend(list(map(int, line.split(","))))
+            # 終端文字を入れる
+            one.append(1)
+            # 新しい分を追加
+            sentence.append(one)
+            line = s.readline()
 
-# 単語の種類
-n_word = max([max(l) for l in sentence]) + 1
+        # クローズ処理
+        s.close()
 
-# 最長の文の長さ
-l_max = max([len(l) for l in sentence])
-# バッチ処理の都合により長さを揃える
-for i in range(len(sentence)):
-    # 不足分は終端文字で埋める
-    sentence[i].extend([1] * (l_max - len(sentence[i])))
+        # 単語の種類
+        n_word = max([max(l) for l in sentence]) + 1
 
-# ニューラルネットワークの生成
-model = Generate_RNN(n_word, 200)
+        # 最長の文の長さ
+        l_max = max([len(l) for l in sentence])
+        # バッチ処理の都合により長さを揃える
+        for i in range(len(sentence)):
+            # 不足分は終端文字で埋める
+            sentence[i].extend([1] * (l_max - len(sentence[i])))
 
-if uses_device >= 0:
-    # GPUを使用
-    chainer.cuda.get_device_from_id(0).use()
-    chainer.cuda.check_cuda_available()
-    # データの変換
-    model.to_gpu()
+        # ニューラルネットワークの生成
+        model = Generate_RNN(n_word, 200)
 
-# 誤差逆伝播法を選択
-optimizer = optimizers.Adam()
-optimizer.setup(model)
+        if uses_device >= 0:
+            # GPUを使用
+            chainer.cuda.get_device_from_id(0).use()
+            chainer.cuda.check_cuda_available()
+            # データの変換
+            model.to_gpu()
 
-# iteratorを作成
-train_iter = iterators.SerialIterator(sentence, batch_size, shuffle=False)
+        # 誤差逆伝播法を選択
+        optimizer = optimizers.Adam()
+        optimizer.setup(model)
 
-# Trainerを生成
-updater = RNNUpdater(train_iter, optimizer, device=uses_device)
-trainer = training.Trainer(updater, (30, "epoch"), out="result")
+        # iteratorを作成
+        train_iter = iterators.SerialIterator(sentence, batch_size, shuffle=False)
 
-# 進捗を可視化
-trainer.extend(extensions.ProgressBar(update_interval=1))
+        # Trainerを生成
+        updater = RNNUpdater(train_iter, optimizer, device=uses_device)
+        trainer = training.Trainer(updater, (30, "epoch"), out="result")
 
-# 学習の実行
-trainer.run()
+        # 進捗を可視化
+        trainer.extend(extensions.ProgressBar(update_interval=1))
 
-# 結果の保存
-chainer.serializers.save_hdf5("sentence_model.hdf5", model)
+        # 学習の実行
+        trainer.run()
+
+        # 結果の保存
+        chainer.serializers.save_hdf5("sentence_model.hdf5", model)
+
+if __name__ == "__main__":
+    main()

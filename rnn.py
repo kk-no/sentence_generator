@@ -6,6 +6,7 @@ from chainer.training import extensions
 import numpy as np
 import sys
 import codecs
+import gc
 
 batch_size = 10
 uses_device = 0
@@ -39,6 +40,11 @@ class Generate_RNN(chainer.Chain):
         h2 = self.l2(h1)
         y = self.l3(h2)
 
+        del h0
+        del h1
+        del h2
+        gc.collect()
+
         return y
 
 class RNNUpdater(training.StandardUpdater):
@@ -67,7 +73,7 @@ class RNNUpdater(training.StandardUpdater):
         model.reset_state()
 
         # 文の長さだけ繰り返しRNNに学習
-        for i in range(len[0] - 1):
+        for i in range(len(x[0]) - 1):
             # バッチ処理用の配列に変換
             batch = cp.array([s[i] for s in x], dtype=cp.int32)
             # 正解データ配列
